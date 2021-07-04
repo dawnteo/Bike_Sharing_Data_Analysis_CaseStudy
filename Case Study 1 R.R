@@ -1,14 +1,14 @@
 ### Cyclistic_Exercise_Full_Year_Analysis ###
 
-Title: Cyclistic_Exercise_Full_Year_Analysis 
-output: pdf_document
+# Title: How Does a Bike-Share Navigate Speedy Success?
 
 # This analysis is for case study 1 from the Google Data Analytics Certificate (Cyclistic).  It’s originally based on the case study "'Sophisticated, Clear, and Polished’: Divvy and Data Visualization" written by Kevin Hartman (found here: https://artscience.blog/home/divvy-dataviz-case-study). We will be using the Divvy dataset for the case study. The purpose of this script is to consolidate downloaded Divvy data into a single dataframe and then conduct simple analysis to help answer the key question: “In what ways do members and casual riders use Divvy bikes differently?”
+# Raw data from https://divvy-tripdata.s3.amazonaws.com/index.html
 
 # # # # # # # # # # # # # # # # # # # # # # # 
 # Install required packages
 # tidyverse for data import and wrangling
-# libridate for date functions
+# lubridate for date functions
 # ggplot for visualization
 # # # # # # # # # # # # # # # # # # # # # # #  
 
@@ -21,7 +21,16 @@ setwd("~/Documents/Google") #sets your working directory to simplify calls to da
 #=====================
 # STEP 1: COLLECT DATA
 #=====================
-# Upload Divvy datasets (csv files) here
+# Upload Divvy datasets (csv files)
+May_2020 <- read_csv("202005-divvy-tripdata.csv")
+Jun_2020 <- read_csv("202006-divvy-tripdata.csv")
+Jul_2020 <- read_csv("202007-divvy-tripdata.csv")
+Aug_2020 <- read_csv("202008-divvy-tripdata.csv")
+Sep_2020 <- read_csv("202009-divvy-tripdata.csv")
+Oct_2020 <- read_csv("202010-divvy-tripdata.csv")
+Nov_2020 <- read_csv("202011-divvy-tripdata.csv")
+Dec_2020 <- read_csv("202012-divvy-tripdata.csv")
+Jan_2021 <- read_csv("202101-divvy-tripdata.csv")
 Feb_2021 <- read_csv("202102-divvy-tripdata.csv")
 Mar_2021 <- read_csv("202103-divvy-tripdata.csv")
 Apr_2021 <- read_csv("202104-divvy-tripdata.csv")
@@ -32,62 +41,50 @@ May_2021 <- read_csv("202105-divvy-tripdata.csv")
 #====================================================
 # Compare column names each of the files
 # While the names don't have to be in the same order, they DO need to match perfectly before we can use a command to join them into one file
+colnames(May_2020)
+colnames(Jun_2020)
+colnames(Jul_2020)
+colnames(Aug_2020)
+colnames(Sep_2020)
+colnames(Oct_2020)
+colnames(Nov_2020)
+colnames(Dec_2020)
+colnames(Jan_2021)
 colnames(Feb_2021)
 colnames(Mar_2021)
 colnames(Apr_2021)
 colnames(May_2021)
 
-# Rename columns  to make them consisent with Feb_2021 (as this will be the supposed going-forward table design for Divvy)
-
-(Mar_2021 <- rename(Mar_2021
-                   ,ride_id = trip_id
-                   ,rideable_type = bikeid 
-                   ,started_at = start_time  
-                   ,ended_at = end_time  
-                   ,start_station_name = from_station_name 
-                   ,start_station_id = from_station_id 
-                   ,end_station_name = to_station_name 
-                   ,end_station_id = to_station_id 
-                   ,member_casual = usertype))
-
-(Apr_2021 <- rename(Apr_2021
-                   ,ride_id = trip_id
-                   ,rideable_type = bikeid 
-                   ,started_at = start_time  
-                   ,ended_at = end_time  
-                   ,start_station_name = from_station_name 
-                   ,start_station_id = from_station_id 
-                   ,end_station_name = to_station_name 
-                   ,end_station_id = to_station_id 
-                   ,member_casual = usertype))
-
-(May_2021 <- rename(May_2021
-                   ,ride_id = "01 - Rental Details Rental ID"
-                   ,rideable_type = "01 - Rental Details Bike ID" 
-                   ,started_at = "01 - Rental Details Local Start Time"  
-                   ,ended_at = "01 - Rental Details Local End Time"  
-                   ,start_station_name = "03 - Rental Start Station Name" 
-                   ,start_station_id = "03 - Rental Start Station ID"
-                   ,end_station_name = "02 - Rental End Station Name" 
-                   ,end_station_id = "02 - Rental End Station ID"
-                   ,member_casual = "User Type"))
+# All columns are the same; do not need to rename
 
 # Inspect the dataframes and look for inconguencies
+str(May_2020)
+str(Jun_2020)
+str(Jul_2020)
+str(Aug_2020)
+str(Sep_2020)
+str(Oct_2020)
+str(Nov_2020)
+str(Dec_2020)
+str(Jan_2021)
 str(Feb_2021)
 str(Mar_2021)
 str(Apr_2021)
 str(May_2021)
 
+# Data type inconsistencies exist in start/end_station_id (col_character() instead of col_double()) from Dec_2020 to May_2021
+# The start_station_id and end_station_id fields in 6 of the .xlsx files imported as the 'character' data type when they should have been numbers. These fields were changed to numbers using the mutate() function below.
 # Convert ride_id and rideable_type to character so that they can stack correctly
-Mar_2021 <-  mutate(Mar_2021, ride_id = as.character(ride_id)
-                   ,rideable_type = as.character(rideable_type)) 
-Apr_2021 <-  mutate(Apr_2021, ride_id = as.character(ride_id)
-                   ,rideable_type = as.character(rideable_type)) 
-May_2021 <-  mutate(May_2021, ride_id = as.character(ride_id)
-                   ,rideable_type = as.character(rideable_type)) 
+
+Dec_2020 <- mutate(Dec_2020, start_station_id = as.numeric(start_station_id), end_station_id = as.numeric(end_station_id))
+Jan_2021 <- mutate(Jan_2021, start_station_id = as.numeric(start_station_id), end_station_id = as.numeric(end_station_id))
+Feb_2021 <- mutate(Feb_2021, start_station_id = as.numeric(start_station_id), end_station_id = as.numeric(end_station_id))
+Mar_2021 <- mutate(Mar_2021, start_station_id = as.numeric(start_station_id), end_station_id = as.numeric(end_station_id))
+Apr_2021 <- mutate(Apr_2021, start_station_id = as.numeric(start_station_id), end_station_id = as.numeric(end_station_id))
+May_2021 <- mutate(May_2021, start_station_id = as.numeric(start_station_id), end_station_id = as.numeric(end_station_id))
 
 # Stack individual quarter's data frames into one big data frame
-all_trips <- bind_rows(Feb_2021, Mar_2021, Apr_2021, May_2021)
+all_trips <- bind_rows(May_2020, Jun_2020, Jul_2020, Aug_2020, Sep_2020, Oct_2020, Nov_2020, Dec_2020, Jan_2021, Feb_2021, Mar_2021, Apr_2021, May_2021)
 
 # Remove lat, long, birthyear, and gender fields as this data was dropped beginning in 2020
 all_trips <- all_trips %>%  
@@ -216,4 +213,4 @@ all_trips_v2 %>%
 counts <- aggregate(all_trips_v2$ride_length ~ all_trips_v2$member_casual + all_trips_v2$day_of_week, FUN = mean)
 write.csv(counts, file = '~/Documents/Google/avg_ride_length.csv')
 
-#You're done! Congratulations!
+#End of report
